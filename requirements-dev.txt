@@ -1,0 +1,2 @@
+# Development-only dependencies. The unit tests need no API key and no network.
+pytest==9.1.1

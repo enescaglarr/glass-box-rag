@@ -1,0 +1,29 @@
+# Accepted-reply log (generated at runtime)
+accepted_replies.csv
+
+# Environment / secrets
+.env
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.ipynb_checkpoints/
+.pytest_cache/
+
+# Generated vector store (rebuild with: python build_index.py)
+vector_store/*.index
+vector_store/indexed_rows.csv
+
+# Generated trace report (rebuild with: python make_report.py)
+report/
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/

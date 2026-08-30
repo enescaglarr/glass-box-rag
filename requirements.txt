@@ -1,0 +1,9 @@
+# Verified on Python 3.13 (macOS arm64). The project also runs on 3.10-3.12.
+# If you are on Python 3.9, these versions have no wheels - use an older set
+# (faiss-cpu==1.7.4, numpy==1.24.4, pandas==2.2.2, streamlit==1.37.1) or upgrade Python.
+faiss-cpu==1.15.0
+google-genai==2.20.0
+numpy==2.5.2
+pandas==3.0.5
+python-dotenv==1.2.3
+streamlit==1.62.0

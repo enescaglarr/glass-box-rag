@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RAG Trace Explorer</title>
+<meta name="description" content="Four real customer queries traced through the RAG pipeline of the AI Assisted Customer Support project.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 16 16%22><text y=%2213%22 font-size=%2213%22>&#128269;</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@400;500;600;700&family=IBM+Plex+Serif:ital,wght@0,400;0,500;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+
+<header class="mast">
+  <p class="eyebrow">AI Assisted Customer Support &middot; instrumented run</p>
+  <h1>RAG Trace Explorer</h1>
+  <p class="lede">Four real customer queries, run through the live pipeline and recorded at every step: what the retriever pulled out of the vector store, how close each match actually was, the exact prompt that got assembled from those matches, and what came back. <em>Nothing here is illustrative</em> &mdash; every number, every retrieved row and every generated reply is captured output from an actual run.</p>
+  <dl class="specs">
+    <div class="spec"><dt>Embedding</dt><dd id="s-embed">&mdash;</dd></div>
+    <div class="spec"><dt>Generation</dt><dd id="s-llm">&mdash;</dd></div>
+    <div class="spec"><dt>Index</dt><dd id="s-index">&mdash;</dd></div>
+    <div class="spec"><dt>Dimensions</dt><dd id="s-dim">&mdash;</dd></div>
+    <div class="spec"><dt>Intents covered</dt><dd id="s-intent">&mdash;</dd></div>
+  </dl>
+</header>
+
+<section id="pipeline">
+  <div class="sec-head">
+    <p class="eyebrow">The mechanism</p>
+    <h2>Where the answer actually comes from</h2>
+    <p>The model never sees the dataset. It sees three rows the retriever chose, pasted into a prompt. Everything the assistant knows about your company arrives through the teal path; the blue path only rewrites it.</p>
+  </div>
+  <div class="diagram">
+    <svg viewBox="0 0 900 268" role="img" aria-labelledby="digt">
+      <title id="digt">Pipeline: the customer query is embedded and searched against a FAISS index of 270 dataset rows; the three nearest rows' responses are pasted into a prompt template alongside the query, and Gemini returns an urgency score, a category and a drafted reply.</title>
+      <defs>
+        <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+          <path d="M0,1 L9,5 L0,9 z" fill="currentColor"/>
+        </marker>
+      </defs>
+      <g font-family="IBM Plex Mono, monospace" font-size="11">
+
+        <!-- query -->
+        <rect x="8" y="104" width="126" height="52" rx="3" fill="var(--sunk)" stroke="var(--rule-strong)"/>
+        <text x="71" y="125" text-anchor="middle" fill="var(--faint)" font-size="9" letter-spacing="1.2">INBOUND</text>
+        <text x="71" y="142" text-anchor="middle" fill="var(--ink)" font-weight="600" font-size="12">Customer query</text>
+
+        <!-- retrieval band -->
+        <rect x="154" y="26" width="330" height="208" rx="3" fill="var(--retrieve-soft)" stroke="var(--retrieve)" stroke-opacity=".35"/>
+        <text x="166" y="45" fill="var(--retrieve)" font-size="9" letter-spacing="1.4" font-weight="600">RETRIEVAL &mdash; YOUR DATA</text>
+
+        <rect x="170" y="58" width="140" height="46" rx="3" fill="var(--surface)" stroke="var(--rule-strong)"/>
+        <text x="240" y="76" text-anchor="middle" fill="var(--ink)" font-size="11" font-weight="600">Embed query</text>
+        <text x="240" y="92" text-anchor="middle" fill="var(--muted)" font-size="9.5">768-dim, normalised</text>
+
+        <rect x="170" y="122" width="140" height="46" rx="3" fill="var(--surface)" stroke="var(--rule-strong)"/>
+        <text x="240" y="140" text-anchor="middle" fill="var(--ink)" font-size="11" font-weight="600">FAISS IndexFlatL2</text>
+        <text x="240" y="156" text-anchor="middle" fill="var(--muted)" font-size="9.5">270 indexed rows</text>
+
+        <rect x="170" y="186" width="140" height="34" rx="3" fill="var(--surface)" stroke="var(--rule-strong)"/>
+        <text x="240" y="207" text-anchor="middle" fill="var(--ink)" font-size="11" font-weight="600">Top 3 nearest</text>
+
+        <rect x="330" y="88" width="140" height="114" rx="3" fill="var(--surface)" stroke="var(--retrieve)" stroke-dasharray="3 3"/>
+        <text x="400" y="110" text-anchor="middle" fill="var(--retrieve)" font-size="9" letter-spacing="1.2" font-weight="600">CONTEXT</text>
+        <text x="400" y="132" text-anchor="middle" fill="var(--ink)" font-size="11">3 historical</text>
+        <text x="400" y="148" text-anchor="middle" fill="var(--ink)" font-size="11">support replies</text>
+        <text x="400" y="172" text-anchor="middle" fill="var(--muted)" font-size="9.5">verbatim, from</text>
+        <text x="400" y="186" text-anchor="middle" fill="var(--muted)" font-size="9.5">the dataset</text>
+
+        <!-- generation band -->
+        <rect x="504" y="26" width="388" height="208" rx="3" fill="var(--generate-soft)" stroke="var(--generate)" stroke-opacity=".35"/>
+        <text x="516" y="45" fill="var(--generate)" font-size="9" letter-spacing="1.4" font-weight="600">GENERATION &mdash; THE MODEL</text>
+
+        <rect x="520" y="94" width="130" height="102" rx="3" fill="var(--surface)" stroke="var(--rule-strong)"/>
+        <text x="585" y="122" text-anchor="middle" fill="var(--ink)" font-size="11" font-weight="600">Prompt</text>
+        <text x="585" y="138" text-anchor="middle" fill="var(--ink)" font-size="11" font-weight="600">template</text>
+        <text x="585" y="162" text-anchor="middle" fill="var(--muted)" font-size="9.5">query + context</text>
+        <text x="585" y="176" text-anchor="middle" fill="var(--muted)" font-size="9.5">+ 3 instructions</text>
+
+        <rect x="672" y="94" width="126" height="102" rx="3" fill="var(--surface)" stroke="var(--generate)"/>
+        <text x="735" y="128" text-anchor="middle" fill="var(--ink)" font-size="11" font-weight="600">Gemini</text>
+        <text x="735" y="144" text-anchor="middle" fill="var(--ink)" font-size="11" font-weight="600">3.5 Flash Lite</text>
+        <text x="735" y="166" text-anchor="middle" fill="var(--muted)" font-size="9.5">temperature 0</text>
+
+        <text x="822" y="106" fill="var(--faint)" font-size="9" letter-spacing="1.2">OUT</text>
+        <text x="822" y="126" fill="var(--ink)" font-size="10.5">1 &middot; Urgency</text>
+        <text x="822" y="144" fill="var(--ink)" font-size="10.5">2 &middot; Category</text>
+        <text x="822" y="162" fill="var(--ink)" font-size="10.5">3 &middot; Reply</text>
+        <line x1="812" y1="112" x2="812" y2="170" stroke="var(--generate)" stroke-width="2"/>
+
+        <!-- arrows -->
+        <g fill="none" stroke-width="1.4" marker-end="url(#ah)">
+          <path d="M134,130 L164,130 L164,81 L168,81" stroke="var(--retrieve)" color="var(--retrieve)"/>
+          <path d="M240,104 L240,120" stroke="var(--retrieve)" color="var(--retrieve)"/>
+          <path d="M240,168 L240,184" stroke="var(--retrieve)" color="var(--retrieve)"/>
+          <path d="M310,203 L320,203 L320,145 L328,145" stroke="var(--retrieve)" color="var(--retrieve)"/>
+          <path d="M470,145 L518,145" stroke="var(--retrieve)" color="var(--retrieve)"/>
+          <path d="M71,104 L71,60 L500,60 L500,132 L518,132" stroke="var(--generate)" color="var(--generate)" stroke-dasharray="4 3"/>
+          <path d="M650,145 L670,145" stroke="var(--generate)" color="var(--generate)"/>
+          <path d="M798,145 L806,145" stroke="var(--generate)" color="var(--generate)"/>
+        </g>
+        <text x="286" y="55" fill="var(--generate)" font-size="9">query also passed straight through &rarr;</text>
+      </g>
+    </svg>
+  </div>
+</section>
+
+<section id="traces">
+  <div class="sec-head">
+    <p class="eyebrow">Recorded runs</p>
+    <h2>Pick a query, follow it through</h2>
+    <p>Each of these was chosen to stress a different part of the retriever: a clean urgent request, a query full of typos and SMS shorthand, a short low-stakes question, and an angry complaint that maps onto no single intent.</p>
+  </div>
+  <div class="picker" role="tablist" aria-label="Recorded queries" id="picker"></div>
+  <div id="trace"></div>
+</section>
+
+<section id="findings">
+  <div class="sec-head">
+    <p class="eyebrow">What the traces show</p>
+    <h2>Four runs, four things worth knowing</h2>
+  </div>
+  <div class="findings">
+    <div class="finding">
+      <span class="stat">0.10<small>ms</small></span>
+      <h4>Search is free; the network is not</h4>
+      <p>FAISS resolves 270 vectors in a tenth of a millisecond. The 0.3&ndash;1.0&nbsp;s a query takes is almost entirely the two API round trips. Scaling the index up costs far less than it looks.</p>
+    </div>
+    <div class="finding">
+      <span class="stat">0.71<small>cos</small></span>
+      <h4>Distance is a usable confidence signal</h4>
+      <p>The three clean queries land at 0.85&ndash;0.89 cosine similarity against a single intent. The complaint lands at 0.71 and splits across <code>get_refund</code> and <code>payment_issue</code> &mdash; the retriever is telling you it is unsure, in a number you can threshold on.</p>
+    </div>
+    <div class="finding">
+      <span class="stat">1&#8202;/&#8202;99</span>
+      <h4>The index sees 1% of the dataset</h4>
+      <p>270 of 26,872 rows, because the free embedding tier allows 1,000 requests a day. Retrieval quality here is a floor, not a ceiling &mdash; the misses are a sampling budget, not a method failure.</p>
+    </div>
+    <div class="finding">
+      <span class="stat">2.6<small>&ndash;3.5k chars</small></span>
+      <h4>Context dominates the prompt</h4>
+      <p>The instruction scaffold is ~700 characters. Everything else is three retrieved replies pasted in whole. Prompt cost scales with <em>k</em>, which is why <code>k=3</code> and not <code>k=10</code>.</p>
+    </div>
+    <div class="finding">
+      <span class="stat">100<small>% typo-tolerant</small></span>
+      <h4>Typos cost nothing</h4>
+      <p><q>how do i chnge the adress my stuff gets sent 2</q> retrieved the right intent at the <em>highest</em> similarity of all four runs. Embeddings match meaning, and the dataset itself is 20% deliberate typos.</p>
+    </div>
+    <div class="finding">
+      <span class="stat">{{&nbsp;}}</span>
+      <h4>Placeholders leak into the draft</h4>
+      <p>Retrieved rows carry entity tokens like <code>{{Order Number}}</code>. The model copies them straight into its reply. In production these get filled from a CRM before the agent ever sees the draft.</p>
+    </div>
+  </div>
+</section>
+
+<section id="quotas">
+  <div class="sec-head">
+    <p class="eyebrow">Operating envelope</p>
+    <h2>The free tier decides the architecture</h2>
+    <p>Model choice here was not about capability. Requests-per-day is the binding constraint, and it varies by two orders of magnitude between models that are otherwise interchangeable for this task.</p>
+  </div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>Model</th><th>Role</th><th>RPM</th><th>TPM</th><th>Requests / day</th></tr></thead>
+      <tbody>
+        <tr><td><strong>gemini-embedding-001</strong></td><td>Retrieval</td><td class="mono">100</td><td class="mono">30K</td><td class="mono">1,000</td></tr>
+        <tr><td><strong>gemini-3.5-flash-lite</strong></td><td>Generation</td><td class="mono">15</td><td class="mono">250K</td><td class="mono">500</td></tr>
+        <tr class="dim"><td><strong>gemini-3.5-flash</strong></td><td>rejected</td><td class="mono">5</td><td class="mono">250K</td><td class="mono">20</td></tr>
+        <tr class="dim"><td><strong>gemini-2.5-flash</strong></td><td>rejected</td><td class="mono">5</td><td class="mono">250K</td><td class="mono">20</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="note">Every text inside a batched embedding call counts as its own request, so the 1,000/day cap is also a 1,000-rows/day indexing cap. That single number is why <code>build_index.py</code> samples evenly per intent instead of embedding all 26,872 rows &mdash; the full set would take about 25 days of quota.</p>
+</section>
+
+<footer class="foot">
+  <p>Traces captured from a live run of this repository against the Gemini API. Retrieval corpus: the <a href="https://huggingface.co/datasets/bitext/Bitext-customer-support-llm-chatbot-training-dataset">Bitext Customer Service Tagged Training Dataset</a>, a synthetic corpus released under CDLA-Sharing-1.0. &copy; Bitext Innovations.</p>
+  <p>Quota figures read from the account's own rate-limit dashboard and are specific to that account's free tier.</p>
+</footer>
+
+</div>
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

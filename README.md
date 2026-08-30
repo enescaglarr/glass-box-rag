@@ -2,7 +2,7 @@
 
 [![tests](https://github.com/enescaglarr/glass-box-rag/actions/workflows/tests.yml/badge.svg)](https://github.com/enescaglarr/glass-box-rag/actions/workflows/tests.yml)
 [![licence: MIT](https://img.shields.io/badge/licence-MIT-blue.svg)](LICENSE)
-[![python](https://img.shields.io/badge/python-3.10%E2%80%933.13-blue.svg)](https://python.org)
+[![python](https://img.shields.io/badge/python-3.12%2B-blue.svg)](https://python.org)
 
 A RAG (Retrieval-Augmented Generation) customer support assistant. An inbound customer query is embedded, matched against a FAISS vector store built from a real customer-service dataset, and the closest historical responses are handed to Gemini as context. The model returns three things — an urgency score, a category, and a drafted reply — which a human agent can accept or regenerate with feedback.
 
@@ -79,10 +79,10 @@ Vectors are L2-normalised before indexing, so FAISS's L2 distance ranks identica
 
 | Tool | Check if installed | Install if missing |
 |---|---|---|
-| Python 3.10+ | `python3 --version` | [python.org/downloads](https://python.org/downloads) |
+| Python 3.12+ | `python3 --version` | [python.org/downloads](https://python.org/downloads) |
 | Git | `git --version` | [git-scm.com/downloads](https://git-scm.com/downloads) |
 
-`requirements.txt` is pinned to versions verified on **Python 3.13**. Python 3.10–3.12 work too. Python 3.9 does **not** — none of the pinned versions publish 3.9 wheels; the header comment in `requirements.txt` lists an older set that does, or just upgrade Python.
+**Python 3.12 or newer.** `numpy 2.5` is the binding constraint: it publishes no wheels for 3.11 or below, so the pinned set cannot be installed there. CI verifies 3.12 and 3.13 on every push.
 
 ### 2. Clone and install dependencies
 
@@ -164,7 +164,7 @@ Enter a query such as *"i cant cancel my order and i need my money back"*, press
 | `404 models/... is not found` | Using a retired model name | Model names are centralised at the top of `src/helper.py`. Run `client.models.list()` to see what your key can reach |
 | `AttributeError: module 'google.genai' has no attribute 'configure'` | Following a tutorial written for the retired `google-generativeai` package | This project uses `google-genai`: build a `genai.Client(api_key=...)` and call `client.models.*` |
 | Retrieval returns unrelated intents | Index built with too small a sample | Rebuild with a higher `--per-intent` |
-| `Could not find a version that satisfies the requirement faiss-cpu==...` | Your Python is too old (or too new) for the pinned wheel | Check `python3 --version`. The pins target 3.10–3.13; on 3.9 use the older set noted at the top of `requirements.txt` |
+| `Could not find a version that satisfies the requirement numpy==...` | Python older than 3.12 | Check `python3 --version`. numpy 2.5 ships no wheels below 3.12, so the pinned set needs 3.12 or newer |
 | `bad interpreter: .../python: no such file or directory` | The project folder was moved after the venv was created — venv console scripts hardcode an absolute path | Either run everything through the module form (`python -m streamlit run demo.py`, `python -m pip install ...`) or recreate the venv: `rm -rf .venv && python3 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt` |
 
 ---

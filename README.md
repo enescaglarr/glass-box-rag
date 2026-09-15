@@ -3,6 +3,7 @@
 [![tests](https://github.com/enescaglarr/glass-box-rag/actions/workflows/tests.yml/badge.svg)](https://github.com/enescaglarr/glass-box-rag/actions/workflows/tests.yml)
 [![licence: MIT](https://img.shields.io/badge/licence-MIT-blue.svg)](LICENSE)
 [![python](https://img.shields.io/badge/python-3.12%2B-blue.svg)](https://python.org)
+[![live demo](https://img.shields.io/badge/live%20demo-enescaglar.com-blue)](https://enescaglar.com/#/demo/rag-support-chatbot)
 
 A RAG (Retrieval-Augmented Generation) customer support assistant. An inbound customer query is embedded, matched against a FAISS vector store built from a real customer-service dataset, and the closest historical responses are handed to Gemini as context. The model returns three things — an urgency score, a category, and a drafted reply — which a human agent can accept or regenerate with feedback.
 
